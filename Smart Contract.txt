@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract buy_shoe_online{
+
+    struct Shoe{
+        address seller;
+        string name;
+        uint8 id;
+        uint prize;
+    }
+    Shoe obj;
+
+    mapping(uint8=>Shoe) public Shoes;
+    
+    function createShoe(string memory _name,uint8 _id,uint _prize) external {
+        Shoes[_id] = Shoe(msg.sender,_name,_id,_prize);
+        Shoes[_id].prize=_prize*10**18;
+    }
+    function buyShoe(uint8 id) external payable {
+        require(msg.value==Shoes[id].prize,"send the required amount");
+        payable(Shoes[id].seller).transfer(msg.value);
+        delete Shoes[id];
+    }
+}
