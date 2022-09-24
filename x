@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract supplyChain{
+    address  supplier;
+    constructor(){
+        supplier=msg.sender;
+    }
+    uint counter=0;
+
+    struct item{   //supplier
+        uint price;
+        string des;
+        address buyer;
+        bool available;
+    }
+    mapping(uint => item) public items;
+
+    modifier onlyOwnner{
+        require(msg.sender==supplier,"you cannot access this function");
+        _;
+    }
+    function addItem(uint _price,string memory _des) external{  //customer
+        items[counter] = item(_price,_des,address(0),true);
+        counter++;
+    }
+    function buy(uint _id) external payable {
+        require(msg.value == items[_id].price,"send the required amount" );  //customer
+        payable(supplier).transfer(msg.value);
+        items[_id].buyer=msg.sender;
+        items[_id].available=false;
+    }
+}
